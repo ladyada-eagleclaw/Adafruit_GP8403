@@ -15,6 +15,7 @@
  */
 
 #include "Adafruit_GP8403.h"
+
 #include <Adafruit_BusIO_Register.h>
 
 /**
@@ -45,7 +46,7 @@ Adafruit_GP8403::~Adafruit_GP8403() {
  * @param wire I2C interface to use.
  * @return true if the probe and all initialization writes succeeded.
  */
-bool Adafruit_GP8403::begin(uint8_t address, TwoWire *wire) {
+bool Adafruit_GP8403::begin(uint8_t address, TwoWire* wire) {
   delete _i2c_dev;
   _i2c_dev = new Adafruit_I2CDevice(address, wire);
 
@@ -102,8 +103,7 @@ bool Adafruit_GP8403::setRaw(uint8_t channel, uint16_t value) {
  * @return true if both values were valid and the I2C write succeeded.
  */
 bool Adafruit_GP8403::setRawValues(uint16_t channel0, uint16_t channel1) {
-  if (channel0 > GP8403_MAX_RAW_VALUE ||
-      channel1 > GP8403_MAX_RAW_VALUE) {
+  if (channel0 > GP8403_MAX_RAW_VALUE || channel1 > GP8403_MAX_RAW_VALUE) {
     return false;
   }
 
@@ -234,8 +234,8 @@ bool Adafruit_GP8403::writeRawValues(uint16_t channel0, uint16_t channel1) {
   uint16_t wireChannel0 = channel0 << 4;
   uint16_t wireChannel1 = channel1 << 4;
   uint32_t wireValues = ((uint32_t)wireChannel1 << 16) | wireChannel0;
-  Adafruit_BusIO_Register channelRegister(
-      _i2c_dev, GP8403_COMMAND_CHANNEL_0, 4, LSBFIRST);
+  Adafruit_BusIO_Register channelRegister(_i2c_dev, GP8403_COMMAND_CHANNEL_0, 4,
+                                          LSBFIRST);
   if (!channelRegister.write(wireValues)) {
     return false;
   }
@@ -252,7 +252,7 @@ bool Adafruit_GP8403::writeRawValues(uint16_t channel0, uint16_t channel1) {
  * @param value Destination for the converted value.
  * @return true if the voltage is finite and within the selected range.
  */
-bool Adafruit_GP8403::voltageToRaw(float volts, uint16_t &value) {
+bool Adafruit_GP8403::voltageToRaw(float volts, uint16_t& value) {
   float fullScale = fullScaleVoltage();
   if (!isfinite(volts) || volts < 0.0 || volts > fullScale) {
     return false;
@@ -279,7 +279,7 @@ namespace {
 constexpr uint8_t GP8403_NVM_HALF_PERIOD_US = 5;
 
 class GP8403NVMWriter {
-public:
+ public:
   GP8403NVMWriter(uint16_t sdaPin, uint16_t sclPin) {
     _sdaPin = sdaPin;
     _sclPin = sclPin;
@@ -346,8 +346,8 @@ public:
     delayMicroseconds(GP8403_NVM_HALF_PERIOD_US);
     release(_sclPin);
     delayMicroseconds(GP8403_NVM_HALF_PERIOD_US);
-    bool acknowledged = digitalRead(_sclPin) == HIGH &&
-                        digitalRead(_sdaPin) == LOW;
+    bool acknowledged =
+        digitalRead(_sclPin) == HIGH && digitalRead(_sdaPin) == LOW;
     driveLow(_sclPin);
     delayMicroseconds(GP8403_NVM_HALF_PERIOD_US);
     return clocksHigh && acknowledged;
@@ -363,7 +363,7 @@ public:
     return stop() && waveformOK;
   }
 
-private:
+ private:
   static void driveLow(uint16_t pin) {
     digitalWrite(pin, LOW);
     pinMode(pin, OUTPUT);
@@ -449,8 +449,8 @@ bool Adafruit_GP8403::saveToNVM(uint16_t sdaPin, uint16_t sclPin) {
       exitStopOK = writer.stop();
     }
   }
-  bool exited = exitPreambleOK && exitStartOK && exitCommandACK && exitDataACK &&
-                exitStopOK;
+  bool exited = exitPreambleOK && exitStartOK && exitCommandACK &&
+                exitDataACK && exitStopOK;
   writer.releaseBus();
   return entered && dataWaveformOK && exited;
 }

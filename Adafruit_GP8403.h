@@ -32,12 +32,11 @@ enum gp8403_output_range_t {
 
 /** @brief Driver for the GP8403 dual-channel 12-bit DAC. */
 class Adafruit_GP8403 {
-public:
+ public:
   Adafruit_GP8403();
   ~Adafruit_GP8403();
 
-  bool begin(uint8_t address = GP8403_DEFAULT_ADDRESS,
-             TwoWire *wire = &Wire);
+  bool begin(uint8_t address = GP8403_DEFAULT_ADDRESS, TwoWire* wire = &Wire);
 
   bool setOutputRange(gp8403_output_range_t range);
   gp8403_output_range_t getOutputRange();
@@ -52,14 +51,14 @@ public:
 
   bool saveToNVM(uint16_t sdaPin, uint16_t sclPin);
 
-private:
+ private:
   bool writeOutputRange(gp8403_output_range_t range);
   bool writeRaw(uint8_t channel, uint16_t value);
   bool writeRawValues(uint16_t channel0, uint16_t channel1);
-  bool voltageToRaw(float volts, uint16_t &value);
+  bool voltageToRaw(float volts, uint16_t& value);
   float fullScaleVoltage();
 
-  Adafruit_I2CDevice *_i2c_dev; ///< BusIO I2C device
+  Adafruit_I2CDevice* _i2c_dev; ///< BusIO I2C device
   gp8403_output_range_t _range; ///< Cached output range
   uint16_t _raw[2];             ///< Cached channel DAC values
 };
