@@ -79,13 +79,18 @@ and voltages above the selected range are rejected without an I2C write.
 Saving is never automatic. Do not call it repeatedly or from a loop; the
 datasheet does not specify the nonvolatile-memory endurance.
 
-The I2C peripheral must be released before saving and restored afterward:
+Release the I2C peripheral before saving, then restore it afterward. ESP8266 is
+the exception because its software I2C core does not provide `Wire.end()`:
 
 ```cpp
+#ifndef ESP8266
 Wire.end();
+#endif
 bool saved = gp8403.saveToNVM(SDA, SCL);
 Wire.begin();
 ```
+
+On ESP8266, `saveToNVM()` takes control of SDA and SCL directly.
 
 If your application uses custom pins, speed, or other bus settings, restore the
 same configuration instead of using the parameterless `Wire.begin()` shown
