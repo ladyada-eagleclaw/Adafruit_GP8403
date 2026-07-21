@@ -10,7 +10,7 @@
  *
  * WARNING: NVM programming uses a special open-drain waveform, not a normal
  * I2C transaction. Wire must be stopped before saveToNVM() and restarted
- * afterward.
+ * afterward. ESP8266 is the exception because it does not provide Wire.end().
  *
  * WARNING: NVM programming always uses the GP8403's hardcoded 0x58 address.
  * It cannot save a device configured at another I2C address.
@@ -60,9 +60,12 @@ void setup() {
   waitForCommand('S');
 
   // saveToNVM() temporarily controls SDA and SCL directly as open-drain GPIO.
-  // Stop Wire first so the I2C peripheral releases those pins. If your project
-  // uses custom pins or bus settings, restore that same configuration below.
+  // Stop Wire first. ESP8266's software I2C implementation is the exception
+  // because it does not provide Wire.end(). If your project uses custom pins
+  // or bus settings, restore that same configuration below.
+#ifndef ESP8266
   Wire.end();
+#endif
   bool saved = gp8403.saveToNVM(SDA, SCL);
   Wire.begin();
 

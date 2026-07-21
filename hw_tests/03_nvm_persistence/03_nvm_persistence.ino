@@ -127,7 +127,9 @@ char waitForCommand() {
 }
 
 bool saveNVM() {
+#ifndef ESP8266
   Wire.end();
+#endif
   bool saved = gp8403.saveToNVM(SDA, SCL);
   Wire.begin();
   return saved;
